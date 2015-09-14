@@ -125,12 +125,16 @@ POSSIBILITY OF SUCH DAMAGE.
 # Imports
 # ---------------------------------------------------------------------------
 
+from __future__ import print_function
 import random
 import os
 import sys
-import cPickle as pickle
-
-from grizzled.cmdline import CommandLineParser
+import argparse
+try:
+    import cPickle as pickle
+except ImportError:
+    # Python 3 merged cPickle and pickle under one interface
+    import pickle
 
 # ---------------------------------------------------------------------------
 # Exports
@@ -143,7 +147,7 @@ __version__   = '1.0'
 __author__    = 'Brian M. Clapper'
 __email__     = 'bmc@clapper.org'
 __url__       = 'http://software.clapper.org/fortune/'
-__copyright__ = '2008-2011 Brian M. Clapper'
+__copyright__ = '2008-2015 Brian M. Clapper'
 __license__   = 'BSD-style license'
 
 # ---------------------------------------------------------------------------
@@ -180,9 +184,9 @@ def get_random_fortune(fortune_file):
     """
     fortune_index_file = fortune_file + '.dat'
     if not os.path.exists(fortune_index_file):
-        raise ValueError, 'Can\'t find file "%s"' % fortune_index_file
+        raise ValueError('Can\'t find file "{}"'.format(fortune_index_file))
 
-    fortuneIndex = open(fortune_index_file)
+    fortuneIndex = open(fortune_index_file, 'rb')
     data = pickle.load(fortuneIndex)
     fortuneIndex.close()
     randomRecord = random_int(0, len(data) - 1)
@@ -192,7 +196,7 @@ def get_random_fortune(fortune_file):
     f.seek(start)
     fortuneCookie = f.read(length)
     f.close()
-    return fortuneCookie
+    return fortuneCookie[0:-1] # strips trailing newline
 
 def _read_fortunes(fortune_file):
     """ Yield fortunes as lists of lines """
@@ -227,10 +231,11 @@ def make_fortune_data_file(fortune_file, quiet=False):
     """
     fortune_index_file = fortune_file + '.dat'
     if not quiet:
-        print 'Updating "%s" from "%s"...' % (fortune_index_file, fortune_file)
+        print('Updating "{}" from "{}"...'.format(
+            fortune_index_file, fortune_file))
 
     data = []
-    shortest = sys.maxint
+    shortest = sys.maxsize
     longest = 0
     for start, length, fortune in _read_fortunes(open(fortune_file, 'rU')):
         data += [(start, length)]
@@ -242,46 +247,47 @@ def make_fortune_data_file(fortune_file, quiet=False):
     fortuneIndex.close()
 
     if not quiet:
-        print 'Processed %d fortunes.\nLongest: %d\nShortest %d' %\
-              (len(data), longest, shortest)
+        print('Processed {} fortunes.\nLongest: {}\nShortest: {}'.format(
+              len(data), longest, shortest))
 
 def main():
     """
     Main program.
     """
-    usage = 'Usage: %s [OPTIONS] fortune_file' % os.path.basename(sys.argv[0])
-    arg_parser = CommandLineParser(usage=usage)
-    arg_parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
-                          help="When updating the index file, don't emit " \
+    epilogue = ('If <fortune_file> is omitted, fortune looks at the '
+                'FORTUNE_FILE environment variable for the path.')
+    arg_parser = argparse.ArgumentParser(epilog=epilogue)
+    arg_parser.add_argument('-q', '--quiet', action='store_true', dest='quiet',
+                            help="when updating the index file, don't emit " \
                                "messages.")
-    arg_parser.add_option('-u', '--update', action='store_true', dest='update',
-                          help='Update the index file, instead of printing a '
+    arg_parser.add_argument('-u', '--update', action='store_true', dest='update',
+                            help='Update the index file, instead of printing a '
                                'fortune.')
-    arg_parser.add_option('-V', '--version', action='store_true',
-                          dest='show_version', help='Show version and exit.')
+    arg_parser.add_argument('-V', '--version', action='store_true',
+                            dest='show_version', help='Show version and exit.')
+    arg_parser.add_argument('fortune_file', help='the file to read/write.',
+                            nargs='?')
 
-    arg_parser.epilogue = 'If <fortune_file> is omitted, fortune looks at the ' \
-                          'FORTUNE_FILE environment variable for the path.'
+    args = arg_parser.parse_args()
+    if args.show_version:
+        print('fortune, version %s'.format(__version__))
 
-    options, args = arg_parser.parse_args(sys.argv)
-    if len(args) == 2:
-        fortune_file = args[1]
-
+    fortune_file = ''
+    if args.fortune_file:
+        fortune_file = args.fortune_file
     else:
         try:
             fortune_file = os.environ['FORTUNE_FILE']
         except KeyError:
-            arg_parser.show_usage('Missing fortune file.')
+            arg_parser.print_help()
 
     try:
-        if options.show_version:
-            print 'fortune, version %s' % __version__
-        elif options.update:
+        if args.update:
             make_fortune_data_file(fortune_file)
         else:
-            sys.stdout.write(get_random_fortune(fortune_file))
-    except ValueError, msg:
-        print >> sys.stderr, msg
+            print(get_random_fortune(fortune_file))
+    except ValueError as e:
+        print(e, file=sys.stderr)
         sys.exit(1)
 
 if __name__ == '__main__':
