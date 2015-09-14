@@ -55,11 +55,11 @@ setup(name             = NAME,
       author           = info['__author__'],
       author_email     = info['__email__'],
       entry_points     = {'console_scripts' : ['fortune=fortune:main']},
-      install_requires = ['grizzled-python>=1.0'],
       classifiers      = ['Intended Audience :: End Users/Desktop',
                           'Operating System :: OS Independent',
                           'Topic :: Games/Entertainment',
                           'License :: OSI Approved :: BSD License',
-                          'Programming Language :: Python',
+                          'Programming Language :: Python 2',
+                          'Programming Language :: Python 3',
                           'Topic :: Text Processing :: Filters']
 )
