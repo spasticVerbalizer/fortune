@@ -9,6 +9,8 @@ it's similar to the BSD fortune program originally written by [Ken Arnold][].
 Unlike Arnold's program, this version is written in [Python][] and should
 run anywhere there's a Python interpreter.
 
+This version has been updated to work on both Python 2 and 3.
+
 For installation and usage instructions, please see the [web page][].
 
 [Ken Arnold]: http://en.wikipedia.org/wiki/Ken_Arnold
