@@ -143,7 +143,7 @@ except ImportError:
 __all__ = ['main', 'get_random_fortune', 'make_fortune_data_file']
 
 # Info about the module
-__version__   = '1.0'
+__version__   = '1.1'
 __author__    = 'Brian M. Clapper'
 __email__     = 'bmc@clapper.org'
 __url__       = 'http://software.clapper.org/fortune/'
