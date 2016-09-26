@@ -40,14 +40,14 @@ info = load_info()
 
 # Now the setup stuff.
 
-NAME = 'fortune'
+NAME = 'sv_fortune'
 DOWNLOAD_URL = ('http://pypi.python.org/packages/source/f/%s/%s-%s.tar.gz' %
                 (NAME, NAME, info['__version__']))
 
 setup(name             = NAME,
       download_url     = DOWNLOAD_URL,
       version          = info['__version__'],
-      description      = 'Python version of old BSD Unix fortune program',
+      description      = 'Python version of old BSD Unix fortune program, python3-patched',
       long_description = info['long_description'],
       packages         = find_packages(),
       url              = info['__url__'],
