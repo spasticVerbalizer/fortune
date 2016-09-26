@@ -59,7 +59,7 @@ setup(name             = NAME,
                           'Operating System :: OS Independent',
                           'Topic :: Games/Entertainment',
                           'License :: OSI Approved :: BSD License',
-                          'Programming Language :: Python 2',
-                          'Programming Language :: Python 3',
+                          'Programming Language :: Python :: 2',
+                          'Programming Language :: Python :: 3',
                           'Topic :: Text Processing :: Filters']
 )
